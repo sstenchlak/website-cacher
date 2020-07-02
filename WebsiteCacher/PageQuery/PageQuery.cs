@@ -46,12 +46,13 @@ namespace WebsiteCacher
             }
 
             page.Depth = 0;
+            var dependantSet = new HashSet<Page>();
+            dependantSet.Add(page);
+            ISet<Page> dependant = dependantSet;
 
-            ISet<Page> dependant = new HashSet<Page>(await page.Scrape(force));
-
-            for (int depth = 1; depth <= Depth; depth++)
+            for (int depth = 0; depth <= Depth; depth++)
             {
-                dependant = await PageQueryManager.PageManager.ScrapeDepth(dependant, depth - 1, this, depth != Depth);
+                dependant = await PageQueryManager.PageManager.ScrapeDepth(dependant, depth, this, depth != Depth);
             }
         }
 

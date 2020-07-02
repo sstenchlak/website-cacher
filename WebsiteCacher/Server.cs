@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using WebsiteCacher.ServerControllers;
 
 namespace WebsiteCacher
 {
     class Server
     {
         private readonly HttpListener Listener = new HttpListener();
-        private readonly ResourceManager ResourceManager;
+        public readonly ResourceManager ResourceManager;
 
         public Server(int port, ResourceManager resourceManager)
         {
@@ -28,27 +29,17 @@ namespace WebsiteCacher
         private async void OnContext(HttpListenerContext context)
         {
             var path = context.Request.Url.PathAndQuery;
-            // First directory in url
-            var action = context.Request.Url.Segments.Length >= 1 ? context.Request.Url.Segments[1] : null;
 
-
-            var start = context.Request.Url.PathAndQuery.IndexOf('/', 1);
-            string query = "";
-            if (start > 0)
+            var controlProtocol = "/website-cacher://";
+            if (path.StartsWith(controlProtocol))
             {
-                query = context.Request.Url.PathAndQuery.Substring(start + 1);
+                var controller = new ServerDriver(this);
+                await controller.Process(path.Substring(controlProtocol.Length), context);
+                controller.Output(context.Response);
             }
-
-            // Simple router
-            switch (action)
+            else
             {
-                case "r/":
-                    await this.ActionResource(query, context.Response);
-                    break;
-                default:
-                    context.Response.StatusCode = 400;
-                    break;
-
+                await this.ActionResource(path, context.Response);
             }
 
             context.Response.OutputStream.Close();

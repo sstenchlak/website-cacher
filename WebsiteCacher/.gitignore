@@ -1,2 +1,4 @@
 Migrations/
 site_database.db*
+downloads/
+static/

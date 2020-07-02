@@ -43,7 +43,7 @@ namespace WebsiteCacher
         private string FixLink(string link)
         {
             var absolute = this.Processor.GetAbsoluteLink(link);
-            return $"/r/{absolute}";
+            return $"/{absolute}";
         }
 
         public Stream GetResult()
