@@ -23,14 +23,14 @@ namespace WebsiteCacher
         /// <param name="url">URL address of the page</param>
         /// <param name="pageQuery">Represents scraping policy</param>
         /// <returns>Page instance represented by url and scraping policy</returns>
-        public Page GetOrCreatePage(string url, PageQuery pageQuery)
+        public async Task<Page> GetOrCreatePage(string url, PageQuery pageQuery)
         {
             // todo: May cause problems because the first parameter is expected to be a resource
             PageData pageData = Context.Pages.Find(url, pageQuery.Id);
 
             if (pageData == null)
             {
-                var resource = ResourceManager.GetOrCreateResource(url);
+                var resource = await ResourceManager.GetOrCreateResource(url);
                 pageData = new PageData
                 {
                     Resource = resource.DbEntity(),

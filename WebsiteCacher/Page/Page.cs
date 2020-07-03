@@ -48,7 +48,7 @@ namespace WebsiteCacher
         {
             Console.WriteLine(Url);
 
-            var resource = PageManager.ResourceManager.GetOrCreateResource(PageData.Resource.URL);
+            var resource = await PageManager.ResourceManager.GetOrCreateResource(PageData.Resource.URL);
 
             bool result = await DownloadResourceByTime(resource, false);
 
@@ -70,8 +70,7 @@ namespace WebsiteCacher
 
                 await ProcessMedia(media, false);
 
-
-                if (makeLinks) dependants = ProcessLinks(links, false, depthForNewLinks);
+                if (makeLinks) dependants = await ProcessLinks(links, false, depthForNewLinks);
 
                 PageManager.ResourceManager.Context.SaveChanges();
             }
@@ -122,11 +121,13 @@ namespace WebsiteCacher
             // Second, add new media
             foreach (var m in newMedia)
             {
-                var newResource = PageManager.ResourceManager.GetOrCreateResource(m);
+                var newResource = await PageManager.ResourceManager.GetOrCreateResource(m);
                 newList.Add(new PageResourceMedia { TargetResource = newResource.Data });
             }
 
             PageData.Medias = newList;
+
+            PageManager.Context.SaveChanges();
 
             // Download resources
             foreach (var relation in newList)
@@ -142,7 +143,7 @@ namespace WebsiteCacher
         /// we want to traverse the www tree in BFS order instead of DFS where recursion can be used.
         /// </summary>
         /// <param name="newLinks">List of absolute urls to websites by current policy</param>
-        private IEnumerable<Page> ProcessLinks(ISet<string> newLinks, bool force, int DepthForNewLinks)
+        private async Task<IEnumerable<Page>> ProcessLinks(ISet<string> newLinks, bool force, int DepthForNewLinks)
         {
             PageManager.ResourceManager.Context.Entry(PageData).Collection(b => b.ChildrenPages).Load();
 
@@ -163,7 +164,7 @@ namespace WebsiteCacher
             // Second, create new Pages
             foreach (var m in newLinks)
             {
-                var page = PageManager.GetOrCreatePage(m, PageQuery);
+                var page = await PageManager.GetOrCreatePage(m, PageQuery);
                 newList.Add(new PagePageRelation { TargetPage = page.DbEntity() });
             }
 
@@ -178,8 +179,9 @@ namespace WebsiteCacher
             }
 
             PageData.ChildrenPages = newList;
+            PageManager.Context.SaveChanges();
 
-            return from relation in newList where relation.TargetPage.Depth == DepthForNewLinks select PageManager.GetOrCreatePage(relation.TargetPage);
+            return (from relation in newList where relation.TargetPage.Depth == DepthForNewLinks select PageManager.GetOrCreatePage(relation.TargetPage)).ToList();
         }
     }
 }

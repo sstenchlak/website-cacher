@@ -10,6 +10,7 @@
 <body>
     <div class="content">
         <h1>Website cacher</h1>
+
         <h2>Page queries</h2>
         <p>Page queries are requests to download buch of websites for offline browsing. Each page query is represented by a root page and other parameters such as how deep we should scrape.</p>
         <button id="pageQueriesRefresh">Refresh</button>
@@ -28,6 +29,22 @@
 
             </tbody>
         </table>
+
+        <h2>Add query</h2>
+        <form id="newPageQueryForm" method="POST" action="/website-cacher://page-queries/add">
+            <label for="url">URL:</label><br>
+            <input type="text" name="url" value=""><br>
+            <label for="depth">Depth:</label><br>
+            <input type="number" id="depth" name="depth" value="1"><br>
+            <label for="time">Time:</label><br>
+            <input type="number" id="time" name="time" value="3600"><br>
+
+            <label for="page_regexp">Page regexp:</label><br>
+            <input type="text" name="page_regexp" value=".*"><br>
+            <label for="media_regexp">Media regexp:</label><br>
+            <input type="text" name="media_regexp" value=".*"><br>
+            <input type="submit" value="Submit">
+        </form>
     </div>
 
 </body>

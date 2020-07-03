@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace WebsiteCacher
 {
@@ -25,10 +26,11 @@ namespace WebsiteCacher
         /// Properly creates a new PageQuery. That means that after the setting of URL and depth, you can call .Scrape()
         /// and actually download some webpages.
         /// </summary>
-        public PageQuery CreateNew()
+        public async Task<PageQuery> CreateNew()
         {
             PageQueryData data = new PageQueryData();
             Context.PageQueries.Add(data);
+            Context.SaveChanges();
             return GetByData(data);
         }
 
@@ -65,10 +67,14 @@ namespace WebsiteCacher
         /// <returns></returns>
         public IEnumerable<PageQuery> GetAll()
         {
+            // Unfortunatelly we cannot use yield return because of database locking
+            var result = new List<PageQuery>();
+            Context.SaveChanges();
             foreach (var query in Context.PageQueries)
             {
-                yield return GetByData(query);
+                result.Add(GetByData(query));
             }
+            return result;
         }
     }
 }

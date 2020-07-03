@@ -38,7 +38,7 @@ namespace WebsiteCacher
 
             if (PageQueryData.RootPage == null || PageQueryData.RootPage.Resource.URL != PageQueryData.URL)
             {
-                page = PageQueryManager.PageManager.GetOrCreatePage(PageQueryData.URL, this);
+                page = await PageQueryManager.PageManager.GetOrCreatePage(PageQueryData.URL, this);
                 PageQueryData.RootPage = page.DbEntity();
             } else
             {

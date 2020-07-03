@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace WebsiteCacher
 {
@@ -20,7 +21,7 @@ namespace WebsiteCacher
             HashSolver = hashSolver;
         }
 
-        public Resource GetOrCreateResource(string url)
+        public async Task<Resource> GetOrCreateResource(string url)
         {
             var query = from r in this.Context.Resources where (r.URL == url) select r;
             var resourceData = query.FirstOrDefault();
