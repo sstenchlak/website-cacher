@@ -6,7 +6,7 @@ Web client is located in `WebClient` directory. Build instructions:
 ```PowerShell
 cd WebClient
 npm install
-npm run production
+npm run build
 ```
 
 Then you have to copy all the files from `WebClient/dist` and `WebClient/static` directories into `static/` directory where the server is located. These files will be hosted by a WebsiteCacher to a client with offline webpages.

@@ -33,6 +33,12 @@ namespace WebsiteCacher.ServerControllers
                 case "static-content":
                     Controller = new StaticFileController(this.ServerContext);
                     break;
+                case "page-queries":
+                    Controller = new PageQueriesController(this.ServerContext);
+                    break;
+                default:
+                    Controller = new ErrorController(this.ServerContext);
+                    break;
             }
 
             await Controller.Process(parts.Length < 2 ? "" : parts[1], context);

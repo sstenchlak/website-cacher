@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebsiteCacher</title>
+    <script src="/website-cacher://static-content/controlPanel.js"></script>
+    <link rel="stylesheet" href="/website-cacher://static-content/controlPanel.css" />
+</head>
+<body>
+    <div class="content">
+        <h1>Website cacher</h1>
+        <h2>Page queries</h2>
+        <p>Page queries are requests to download buch of websites for offline browsing. Each page query is represented by a root page and other parameters such as how deep we should scrape.</p>
+        <button id="pageQueriesRefresh">Refresh</button>
+        <table>
+            <thead>
+                <tr>
+                    <td>#</td>
+                    <td>URL</td>
+                    <td>Depth</td>
+                    <td>Age till dirty (seconds)</td>
+                    <td>Follow links (regexp)</td>
+                    <td>Follow media (regexp)</td>
+                </tr>
+            </thead>
+            <tbody id="pageQueries">
+
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

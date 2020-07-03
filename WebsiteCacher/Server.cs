@@ -9,11 +9,13 @@ namespace WebsiteCacher
     {
         private readonly HttpListener Listener = new HttpListener();
         public readonly ResourceManager ResourceManager;
+        public readonly PageQueryManager PageQueryManager;
 
-        public Server(int port, ResourceManager resourceManager)
+        public Server(int port, ResourceManager resourceManager, PageQueryManager pageQueryManager)
         {
             this.Listener.Prefixes.Add($"http://localhost:{port}/");
             this.ResourceManager = resourceManager;
+            this.PageQueryManager = pageQueryManager;
         }
 
         public async Task Start()
@@ -37,7 +39,12 @@ namespace WebsiteCacher
                 await controller.Process(path.Substring(controlProtocol.Length), context);
                 controller.Output(context.Response);
             }
-            else
+            else if (path == "/")
+            {
+                var controller = new ServerDriver(this);
+                await controller.Process("static-content/controlPanel.html", context);
+                controller.Output(context.Response);
+            } else
             {
                 await this.ActionResource(path.Substring(1), context.Response);
             }

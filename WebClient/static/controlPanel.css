@@ -1,0 +1,37 @@
+body {
+  background: pink;
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+.content {
+  width: 1000px;
+  margin: 2cm auto;
+  padding: 1cm;
+  background: white;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table td,
+table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+table tr:hover {
+  background-color: #ddd;
+}
+
+table thead tr {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: pink;
+}

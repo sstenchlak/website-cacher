@@ -1,5 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Linq;
+using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
+using System.Runtime.CompilerServices;
 
 namespace WebsiteCacher
 {
@@ -54,6 +57,18 @@ namespace WebsiteCacher
             }
 
             return data.WrapperPageQuery;
+        }
+
+        /// <summary>
+        /// Return all page queries.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<PageQuery> GetAll()
+        {
+            foreach (var query in Context.PageQueries)
+            {
+                yield return GetByData(query);
+            }
         }
     }
 }

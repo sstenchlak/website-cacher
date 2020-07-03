@@ -3,6 +3,7 @@ const path = require('path');
 module.exports = {
     entry: {
         webInjector: './src/webInjector.ts',
+        controlPanel: './src/controlPanel.ts',
     },
     module: {
         rules: [
