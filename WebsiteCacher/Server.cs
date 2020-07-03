@@ -39,7 +39,7 @@ namespace WebsiteCacher
             }
             else
             {
-                await this.ActionResource(path, context.Response);
+                await this.ActionResource(path.Substring(1), context.Response);
             }
 
             context.Response.OutputStream.Close();

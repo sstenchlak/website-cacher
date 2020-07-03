@@ -1,0 +1,41 @@
+.websitecacher-link {
+  z-index: 9999;
+  color: white;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 5px 20px;
+  border-radius: 2px;
+}
+
+.websitecacher-link .arrow,
+.websitecacher-link .arrow::before {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  z-index: -1;
+}
+
+.websitecacher-link .arrow::before {
+  content: "";
+  transform: rotate(45deg);
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.websitecacher-link[data-popper-placement^="top"] > #arrow {
+  bottom: -4px;
+}
+
+.websitecacher-link[data-popper-placement^="bottom"] > #arrow {
+  top: -4px;
+}
+
+.websitecacher-link[data-popper-placement^="left"] > #arrow {
+  right: -4px;
+}
+
+.websitecacher-link[data-popper-placement^="right"] > #arrow {
+  left: -4px;
+}
+
+.websitecacher-link .websitecacher-danger {color: red; font-weight: bold;}
+.websitecacher-link .websitecacher-warning {color: orange; font-weight: bold;}
+.websitecacher-link .websitecacher-success {color: green; font-weight: bold;}

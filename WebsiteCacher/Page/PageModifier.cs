@@ -26,17 +26,43 @@ namespace WebsiteCacher
             // Process HREF attributes
             var links = this.Processor.Document.DocumentNode.SelectNodes("//*[@href]");
 
-            foreach (var link in links)
+            if (links != null)
             {
-                link.Attributes["href"].Value = this.FixLink(link.Attributes["href"].Value);
+                foreach (var link in links)
+                {
+                    var address = link.Attributes["href"].Value;
+                    link.Attributes["href"].Value = this.FixLink(address);
+                    if (link.Name == "a")
+                    {
+                        link.SetAttributeValue("data-websitecacher-link", this.Processor.GetAbsoluteLink(address));
+                    }
+                }
             }
 
             // Process SRC attributes
             links = this.Processor.Document.DocumentNode.SelectNodes("//*[@src]");
 
-            foreach (var link in links)
+            if (links != null)
             {
-                link.Attributes["src"].Value = this.FixLink(link.Attributes["src"].Value);
+                foreach (var link in links)
+                {
+                    link.Attributes["src"].Value = this.FixLink(link.Attributes["src"].Value);
+                }
+            }
+
+            // Insert into head
+            var head = this.Processor.Document.DocumentNode.SelectSingleNode("//head");
+            if (head != null)
+            {
+                var script = this.Processor.Document.CreateElement("script");
+                script.SetAttributeValue("src", "/website-cacher://static-content/webInjector.js");
+                head.AppendChild(script);
+
+                var style = this.Processor.Document.CreateElement("link");
+                style.SetAttributeValue("rel", "stylesheet");
+                style.SetAttributeValue("type", "text/css");
+                style.SetAttributeValue("href", "/website-cacher://static-content/webInjector.css");
+                head.AppendChild(style);
             }
         }
 
