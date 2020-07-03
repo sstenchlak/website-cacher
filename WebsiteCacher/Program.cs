@@ -19,7 +19,7 @@ namespace WebsiteCacher
 
             Console.WriteLine("Starting server.");
 
-            // We are using asynchronout functions here a lot. The problem is that the database can be accessed only from single
+            // We are using asynchronout functions. The problem is that the database can be accessed only from a single
             // thread and therefore all functions must implicitly run in a single thread.
             // This is problem only for Console Application, Windows Forms and others have its own SynchronizationContext
             // https://devblogs.microsoft.com/pfxteam/await-synchronizationcontext-and-console-apps/

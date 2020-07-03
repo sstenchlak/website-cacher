@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WebsiteCacher
@@ -49,19 +50,24 @@ namespace WebsiteCacher
         /// <returns>If the operation was successfull</returns>
         public async Task<bool> Download()
         {
-            var response = await Fetch();
-            if (response != null)
+            bool status = false;
+            await Task.Run(async () =>
             {
-                string hash = await Manager.HashSolver.ComputeHash(response.Content);
+                var response = await Fetch();
+                if (response != null)
+                {
+                    status = true;
+                    string hash = await Manager.HashSolver.ComputeHash(response.Content);
 
-                await Manager.Storage.Add(hash, response.Content);
-                Data.Hash = hash;
-                Data.Updated = DateTime.Now;
-                Data.ContentType = response.Content.Headers.ContentType?.ToString();
-                Manager.Context.SaveChanges();
-            }
+                    await Manager.Storage.Add(hash, response.Content);
+                    Data.Hash = hash;
+                    Data.Updated = DateTime.Now;
+                    Data.ContentType = response.Content.Headers.ContentType?.ToString();
+                }
+            });
+            await Manager.Context.SaveChangesAsync();
 
-            return response != null;
+            return status;
         }
 
         /// <summary>

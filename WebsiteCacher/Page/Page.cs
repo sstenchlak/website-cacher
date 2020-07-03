@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Cache;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace WebsiteCacher
@@ -18,6 +16,11 @@ namespace WebsiteCacher
         /// Link to database entity in Entity Core Framework
         /// </summary>
         private readonly PageData PageData;
+
+        /// <summary>
+        /// Database entity in Entity Core Framework
+        /// </summary>
+        /// <returns></returns>
         public PageData DbEntity() => PageData;
 
         private readonly PageManager PageManager;
@@ -31,13 +34,25 @@ namespace WebsiteCacher
             PageManager = pageManager;
         }
 
+        /// <summary>
+        /// URL of the page from where it was downloaded
+        /// </summary>
         public string Url { get => PageData.Resource.URL; }
+
+        /// <summary>
+        /// Number representing the shortest path from PageQuery.
+        /// 0 - The page to which PageQuery points
+        /// </summary>
         internal int Depth { get => PageData.Depth; set => PageData.Depth = value; }
+
+        /// <summary>
+        /// Parent PageQuery, root of this page "tree"
+        /// </summary>
         private PageQuery PageQuery { get => PageData.PageQuery.WrapperPageQuery; }
 
         /// <summary>
-        /// Performs scrape on this page.
-        /// Meant to be used by PageQuery
+        /// Performs scraping on this page.
+        /// Meant to be used by PageQuery.
         /// </summary>
         /// <param name="makeLinks">Whether to search for links on this page or just ignore them.</param>
         /// <returns>
@@ -46,12 +61,12 @@ namespace WebsiteCacher
         /// </returns>
         public async Task<IEnumerable<Page>> Scrape(bool forceMedia = false, bool forceLinks = false, bool makeLinks = true, int depthForNewLinks = -1)
         {
-            Console.WriteLine(Url);
+            Console.WriteLine($"Scraping <{Url}>");
 
             var resource = await PageManager.ResourceManager.GetOrCreateResource(PageData.Resource.URL);
-
             bool result = await DownloadResourceByTime(resource, false);
 
+            // List of pages which depends on this one (under the specific PageQuery)
             IEnumerable<Page> dependants = Enumerable.Empty<Page>();
 
             if (result)
@@ -65,8 +80,6 @@ namespace WebsiteCacher
                 };
                 var links = scraper.ScrapeLinks();
                 var media = scraper.ScrapeMedia();
-
-                //foreach (var m in media) Console.WriteLine(m);
 
                 await ProcessMedia(media, false);
 
@@ -83,12 +96,12 @@ namespace WebsiteCacher
         /// </summary>
         /// <param name="resource"></param>
         /// <param name="force">Force download (always)</param>
-        /// <returns></returns>
+        /// <returns>If the resource is successfully cached.</returns>
         private async Task<bool> DownloadResourceByTime(Resource resource, bool force = false)
         {
             if (force || !resource.IsDownloaded || (DateTime.Now - resource.Updated).TotalSeconds > PageQuery.ToleratedAge)
             {
-                Console.WriteLine("    " + resource.URL);
+                Console.WriteLine($"    Downloading <{resource.URL}>");
                 return await resource.Download();
             } else
             {
@@ -104,6 +117,7 @@ namespace WebsiteCacher
         {
             PageManager.ResourceManager.Context.Entry(PageData).Collection(b => b.Medias).Load();
 
+            // We need to update the old list of linked medias
             var newList = new List<PageResourceMedia>();
 
             // First, remove not-used media and from list remove used media
@@ -125,9 +139,9 @@ namespace WebsiteCacher
                 newList.Add(new PageResourceMedia { TargetResource = newResource.Data });
             }
 
+            // Store data and update database
             PageData.Medias = newList;
-
-            PageManager.Context.SaveChanges();
+            await PageManager.Context.SaveChangesAsync();
 
             // Download resources
             foreach (var relation in newList)
@@ -143,6 +157,10 @@ namespace WebsiteCacher
         /// we want to traverse the www tree in BFS order instead of DFS where recursion can be used.
         /// </summary>
         /// <param name="newLinks">List of absolute urls to websites by current policy</param>
+        /// <returns>
+        /// List of pages which depends on this one (under the current PageQuery policy) and were discovered for the first time.
+        /// That means its <code>depth</code> is exactly <code><see cref="Depth"/>+1</code>
+        /// </returns>
         private async Task<IEnumerable<Page>> ProcessLinks(ISet<string> newLinks, bool force, int DepthForNewLinks)
         {
             PageManager.ResourceManager.Context.Entry(PageData).Collection(b => b.ChildrenPages).Load();
@@ -179,9 +197,9 @@ namespace WebsiteCacher
             }
 
             PageData.ChildrenPages = newList;
-            PageManager.Context.SaveChanges();
+            await PageManager.Context.SaveChangesAsync();
 
-            return (from relation in newList where relation.TargetPage.Depth == DepthForNewLinks select PageManager.GetOrCreatePage(relation.TargetPage)).ToList();
+            return from relation in newList where relation.TargetPage.Depth == DepthForNewLinks select PageManager.GetOrCreatePage(relation.TargetPage);
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Threading;
+using Microsoft.VisualBasic.CompilerServices;
+using Newtonsoft.Json;
+using SQLitePCL;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -8,6 +11,10 @@ namespace WebsiteCacher.ServerControllers
 {
     /// <summary>
     /// This controller handles all the operation with PageQuery, such as listing and adding new ones.
+    /// 
+    /// Curent scenations: website-cacher://page-queries/add - Add new PageQuery
+    ///                    website-cacher://page-queries/list - Get all PageQueries
+    ///                    website-cacher://page-queries/scrape/<id>
     /// </summary>
     class PageQueriesController : AbstractServerController
     {
@@ -23,6 +30,10 @@ namespace WebsiteCacher.ServerControllers
             public string page_regexp;
             public string media_regexp;
 
+            /// <summary>
+            /// Explicit cast operator from real PageQuery
+            /// </summary>
+            /// <param name="query"></param>
             public static explicit operator PageQueryInterface(PageQuery query) => new PageQueryInterface {
                 id = query.Id,
                 url = query.StartingURL,
@@ -43,6 +54,14 @@ namespace WebsiteCacher.ServerControllers
         /// </summary>
         private PageQuery CreatedQuery;
 
+        /// <summary>
+        /// Data for <code><see cref="Parameter"/> == "scrape"</code>
+        /// </summary>
+        private bool ScrapeSuccess = false;
+
+        /// <summary>
+        /// Parameter used by the client (add, or list)
+        /// </summary>
         private string Parameter = null;
 
         public PageQueriesController(Server serverContext) : base(serverContext) { }
@@ -61,6 +80,11 @@ namespace WebsiteCacher.ServerControllers
                 data = JsonConvert.SerializeObject((PageQueryInterface)CreatedQuery);
             }
 
+            if (Parameter.StartsWith("scrape/"))
+            { 
+                data = JsonConvert.SerializeObject(ScrapeSuccess);
+            }
+
             using var writer = new StreamWriter(output.OutputStream);
             writer.Write(data);
         }
@@ -69,6 +93,13 @@ namespace WebsiteCacher.ServerControllers
         {
             this.Parameter = parameter;
 
+            // Parse json request
+            var request = context.Request;
+            string text;
+            using var reader = new StreamReader(request.InputStream, request.ContentEncoding);
+            text = reader.ReadToEnd();
+
+            // GET
             if (parameter == "list")
             {
                 ResultList = new List<PageQueryInterface>();
@@ -79,13 +110,9 @@ namespace WebsiteCacher.ServerControllers
                 }
             }
 
+            // POST
             if (parameter == "add")
             {
-                var request = context.Request;
-                string text;
-                using var reader = new StreamReader(request.InputStream, request.ContentEncoding);
-                text = reader.ReadToEnd();
-
                 PageQueryInterface result = JsonConvert.DeserializeObject<PageQueryInterface>(text);
 
                 CreatedQuery = await ServerContext.PageQueryManager.CreateNew();
@@ -94,9 +121,28 @@ namespace WebsiteCacher.ServerControllers
                 CreatedQuery.PageRegex = result.page_regexp;
                 CreatedQuery.ToleratedAge = result.time;
                 CreatedQuery.StartingURL = result.url;
-
-                await CreatedQuery.Scrape();
             }
+
+            // POST
+            if (parameter.StartsWith("scrape/"))
+            {
+                if (int.TryParse(parameter.Substring("scrape/".Length), out var id))
+                {
+                    var pageQuery = ServerContext.PageQueryManager.GetById(id);
+                    if (pageQuery != null)
+                    {
+                        ScrapeSuccess = true;
+
+                        _ = ScrapePageQueryAsync(pageQuery);
+                    }
+                }
+            }
+        }
+
+        private async Task ScrapePageQueryAsync(PageQuery pageQuery)
+        {
+            await Task.CompletedTask;
+            await pageQuery.Scrape();
         }
     }
 }

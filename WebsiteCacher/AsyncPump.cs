@@ -35,6 +35,12 @@ namespace Microsoft.Threading
             finally { SynchronizationContext.SetSynchronizationContext(prevCtx); }
         }
 
+        public async static void RunFromQueue(Func<Task> func)
+        {
+            await Task.CompletedTask;
+            Run(func);
+        }
+
         /// <summary>Provides a SynchronizationContext that's single-threaded.</summary>
         private sealed class SingleThreadSynchronizationContext : SynchronizationContext
         {
