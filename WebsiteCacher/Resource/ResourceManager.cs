@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 
 namespace WebsiteCacher
@@ -53,6 +55,37 @@ namespace WebsiteCacher
             }
 
             return resourceData.WrapperResource;
+        }
+
+        /// <summary>
+        /// Removes those resources from database which are not connected to any page.
+        /// First, you should call PageGC() and then ResouceGC().
+        /// </summary>
+        public void ResourceGC(out int removed, out int kept)
+        {
+            var existingResources = new HashSet<ResourceData>();
+            foreach (var page in Context.Pages)
+            {
+                if (page.Resource != null) existingResources.Add(page.Resource);
+                if (page.Medias != null) foreach (var relation in page.Medias) existingResources.Add(relation.TargetResource);
+            }
+
+            removed = 0;
+            kept = 0;
+
+            foreach (var resource in Context.Resources)
+            {
+                if (!existingResources.Contains(resource))
+                {
+                    GetOrCreateResource(resource).Remove();
+                    removed++;
+                } else
+                {
+                    kept++;
+                }
+            }
+
+            Context.SaveChanges();
         }
     }
 }

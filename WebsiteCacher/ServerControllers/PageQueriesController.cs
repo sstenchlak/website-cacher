@@ -15,6 +15,7 @@ namespace WebsiteCacher.ServerControllers
     /// Curent scenations: website-cacher://page-queries/add - Add new PageQuery
     ///                    website-cacher://page-queries/list - Get all PageQueries
     ///                    website-cacher://page-queries/scrape/<id>
+    ///                    website-cacher://page-queries/remove/<id>
     /// </summary>
     class PageQueriesController : AbstractServerController
     {
@@ -57,7 +58,7 @@ namespace WebsiteCacher.ServerControllers
         /// <summary>
         /// Data for <code><see cref="Parameter"/> == "scrape"</code>
         /// </summary>
-        private bool ScrapeSuccess = false;
+        private bool OperationSuccessfull = false;
 
         /// <summary>
         /// Parameter used by the client (add, or list)
@@ -80,9 +81,9 @@ namespace WebsiteCacher.ServerControllers
                 data = JsonConvert.SerializeObject((PageQueryInterface)CreatedQuery);
             }
 
-            if (Parameter.StartsWith("scrape/"))
+            if (Parameter.StartsWith("scrape/") || Parameter.StartsWith("remove/"))
             { 
-                data = JsonConvert.SerializeObject(ScrapeSuccess);
+                data = JsonConvert.SerializeObject(OperationSuccessfull);
             }
 
             using var writer = new StreamWriter(output.OutputStream);
@@ -131,9 +132,24 @@ namespace WebsiteCacher.ServerControllers
                     var pageQuery = ServerContext.PageQueryManager.GetById(id);
                     if (pageQuery != null)
                     {
-                        ScrapeSuccess = true;
+                        OperationSuccessfull = true;
 
                         _ = ScrapePageQueryAsync(pageQuery);
+                    }
+                }
+            }
+
+            // DELETE
+            if (parameter.StartsWith("remove/"))
+            {
+                if (int.TryParse(parameter.Substring("remove/".Length), out var id))
+                {
+                    var pageQuery = ServerContext.PageQueryManager.GetById(id);
+                    if (pageQuery != null)
+                    {
+                        OperationSuccessfull = true;
+
+                        pageQuery.Remove();
                     }
                 }
             }

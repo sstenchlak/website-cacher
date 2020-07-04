@@ -1,18 +1,35 @@
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("pageQueriesRefresh").addEventListener("click", async () => {
+    let updateTable = async () => {
         let table = document.getElementById("pageQueries");
         table.innerHTML = "<tr><td colspan='7'>LOADING</td></tr>";
         let result = await fetch("/website-cacher://page-queries/list");
         let data = await result.json();
         table.innerHTML = "";
         for (let item of data) {
-            table.innerHTML += `<tr><td>#${item.id}</td><td><a href='/${item.url}'>${item.url}</a></td><td>${item.depth}</td><td>${item.time} s</td><td><pre>${item.page_regexp}</pre></td><td><pre>${item.media_regexp}</pre></td><td><button onclick='window.scrape(${item.id})'>scrape</button></td></tr>`;
+            table.innerHTML += `<tr><td>#${item.id}</td><td><a href='/${item.url}'>${item.url}</a></td><td>${item.depth}</td><td>${item.time} s</td><td><pre>${item.page_regexp}</pre></td><td><pre>${item.media_regexp}</pre></td><td><button onclick='window.scrape(${item.id})'>scrape</button><button onclick='window.pqremove(${item.id})'>remove</button></td></tr>`;
         }
-    });
+    };
+
+    updateTable();
+
+    document.getElementById("pageQueriesRefresh").addEventListener("click", updateTable);
 
     // @ts-ignore
     window['scrape'] = (id: number) => {
         fetch("/website-cacher://page-queries/scrape/" + id);
+    }
+
+    // @ts-ignore
+    window['pqremove'] = (id: number) => {
+        fetch("/website-cacher://page-queries/remove/" + id);
+        updateTable();
+    }
+
+    // @ts-ignore
+    window['garbagecollect'] = async () => {
+        let r = await fetch("/website-cacher://resource/garbage-collect");
+        let d = await r.json();
+        alert(`${d.removed} resources were removed from database and file system. ${d.kept} remains.`)
     }
 
     let form = <HTMLFormElement>document.getElementById("newPageQueryForm");
@@ -39,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
         xhr.send(JSON.stringify(data));
 
         xhr.onloadend = function () {
-            alert("The request has ID #" + JSON.parse(xhr.responseText).id + ".");
+            updateTable();
         };
       };
 });

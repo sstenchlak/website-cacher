@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace WebsiteCacher.ServerControllers
@@ -27,8 +24,8 @@ namespace WebsiteCacher.ServerControllers
 
             switch (parts[0])
             {
-                case "resource-status":
-                    Controller = new ResourceStatusController(this.ServerContext);
+                case "resource":
+                    Controller = new ResourceController(this.ServerContext);
                     break;
                 case "static-content":
                     Controller = new StaticFileController(this.ServerContext);

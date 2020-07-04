@@ -15,7 +15,7 @@ namespace WebsiteCacher
         {
             modelBuilder.Entity<PageData>()
                 .HasMany(b => b.Medias)
-                .WithOne();
+                .WithOne(b => b.SourcePage);
 
             modelBuilder.Entity<PageData>()
                 .HasMany(b => b.ChildrenPages)

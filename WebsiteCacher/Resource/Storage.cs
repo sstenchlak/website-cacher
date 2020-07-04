@@ -41,15 +41,27 @@ namespace WebsiteCacher
             }
         }
 
-        public void Remove(string hash)
+        /// <summary>
+        /// Removes file from storage and directory if empty.
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        public bool Remove(string hash)
         {
             var location = this.GetFileLocation(hash);
-            File.Delete(location);
-            var dir = Path.GetDirectoryName(location);
-            if (Directory.EnumerateFileSystemEntries(dir).Count() == 0)
+            try
             {
-                Directory.Delete(dir);
+                File.Delete(location);
+                var dir = Path.GetDirectoryName(location);
+                if (Directory.EnumerateFileSystemEntries(dir).Count() == 0)
+                {
+                    Directory.Delete(dir);
+                }
+            } catch (Exception)
+            {
+                return false;
             }
+            return true;
         }
 
         public Stream Get(string hash)

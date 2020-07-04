@@ -4,7 +4,7 @@ body {
 }
 
 .content {
-  width: 1000px;
+  max-width: 1000px;
   margin: 2cm auto;
   padding: 1cm;
   background: white;
@@ -34,4 +34,8 @@ table thead tr {
   padding-bottom: 12px;
   text-align: left;
   background-color: pink;
+}
+
+input {
+    width: 100%;
 }

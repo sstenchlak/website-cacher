@@ -71,7 +71,8 @@ namespace WebsiteCacher
 
             if (result)
             {
-                var processor = new HtmlProcessor(resource.Get(), PageData.Resource.URL);
+                using var stream = resource.Get();
+                var processor = new HtmlProcessor(stream, PageData.Resource.URL);
                 processor.Load();
                 IPageScraper scraper = new SimplePageScraper { 
                     Data = resource,

@@ -42,7 +42,7 @@ namespace WebsiteCacher
                 controller.Output(context.Response);
             } else
             {
-                var controller = new ResourceController(this);
+                var controller = new WebResourceController(this);
                 await controller.Process(path.Substring(1), context);
                 controller.Output(context.Response);
             }

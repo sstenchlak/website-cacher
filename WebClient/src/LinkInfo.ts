@@ -49,7 +49,7 @@ export default class LinkInfo {
             ],
           });
 
-        let response = await fetch("/website-cacher://resource-status/" + link.getAttribute("data-websitecacher-link"));
+        let response = await fetch("/website-cacher://resource/status/" + link.getAttribute("data-websitecacher-link"));
         let data = await response.json();
 
         if (link == this.openedLink) {

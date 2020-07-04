@@ -61,7 +61,8 @@ Server uses REST API and .json to comunicate with web client. Webclient is found
 - `<server-address>/website-cacher://page-queries/add` - Adds new `PageQuery` entry.
 - `<server-address>/website-cacher://page-queries/list` - Lists all the `PageQuery`ies.
 - `<server-address>/website-cacher://page-queries/scrape/<id>` - Scrapes specified `PageQuery`.
-- `<server-address>/website-cacher://resource-status/<resourceURL>` - Gives info about resource.
+- `<server-address>/website-cacher://resource/status/<resourceURL>` - Gives info about resource.
+- `<server-address>/website-cacher://resource/garbage-collect` - Removes resources without page.
 
 
 ### Database

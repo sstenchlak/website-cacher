@@ -29,9 +29,9 @@ namespace WebsiteCacher
                 foreach (var link in links)
                 {
                     var absoluteLink = this.Processor.GetAbsoluteLink(link.Attributes["href"].DeEntitizeValue);
-                    if (rx.IsMatch(absoluteLink))
+                    if (rx.IsMatch(absoluteLink) && HtmlProcessor.IsDownloadable(absoluteLink))
                     {
-                        result.Add(absoluteLink);
+                        result.Add(HtmlProcessor.SimplifyUrl(absoluteLink));
                     }
                 }
             }
@@ -58,9 +58,9 @@ namespace WebsiteCacher
                 foreach (var link in hrefs)
                 {
                     var absoluteLink = this.Processor.GetAbsoluteLink(link.Attributes["href"].DeEntitizeValue);
-                    if (rx.IsMatch(absoluteLink))
+                    if (rx.IsMatch(absoluteLink) && HtmlProcessor.IsDownloadable(absoluteLink))
                     {
-                        result.Add(absoluteLink);
+                        result.Add(HtmlProcessor.SimplifyUrl(absoluteLink));
                     }
                 }
             }
@@ -72,9 +72,9 @@ namespace WebsiteCacher
                 foreach (var link in srcs)
                 {
                     var absoluteLink = this.Processor.GetAbsoluteLink(link.Attributes["src"].DeEntitizeValue);
-                    if (rx.IsMatch(absoluteLink))
+                    if (rx.IsMatch(absoluteLink) && HtmlProcessor.IsDownloadable(absoluteLink))
                     {
-                        result.Add(absoluteLink);
+                        result.Add(HtmlProcessor.SimplifyUrl(absoluteLink));
                     }
                 }
             }

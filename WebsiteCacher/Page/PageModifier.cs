@@ -4,6 +4,9 @@ namespace WebsiteCacher
 {
     /// <summary>
     /// This class modifies the webpage before it is sent to the client.
+    /// 
+    /// Page modifier uses <see cref="HtmlProcessor.IsDownloadable(string)"/> to check if the address should be translated or not.
+    /// You can not use <see cref="HtmlProcessor.SimplifyUrl(string)"/> because you loose anchors.
     /// </summary>
     class PageModifier
     {
@@ -31,10 +34,13 @@ namespace WebsiteCacher
                 foreach (var link in links)
                 {
                     var address = link.Attributes["href"].Value;
-                    link.Attributes["href"].Value = this.FixLink(address);
-                    if (link.Name == "a")
+                    if (HtmlProcessor.IsDownloadable(address))
                     {
-                        link.SetAttributeValue("data-websitecacher-link", this.Processor.GetAbsoluteLink(address));
+                        link.Attributes["href"].Value = this.FixLink(address);
+                        if (link.Name == "a")
+                        {
+                            link.SetAttributeValue("data-websitecacher-link", this.Processor.GetAbsoluteLink(address));
+                        }
                     }
                 }
             }
@@ -46,7 +52,10 @@ namespace WebsiteCacher
             {
                 foreach (var link in links)
                 {
-                    link.Attributes["src"].Value = this.FixLink(link.Attributes["src"].Value);
+                    if (HtmlProcessor.IsDownloadable(link.Attributes["src"].Value))
+                    {
+                        link.Attributes["src"].Value = this.FixLink(link.Attributes["src"].Value);
+                    }
                 }
             }
 

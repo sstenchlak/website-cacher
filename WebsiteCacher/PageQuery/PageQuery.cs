@@ -35,10 +35,11 @@ namespace WebsiteCacher
         public async Task Scrape(bool force = false)
         {
             Page page = null;
+            string transformedUrl = HtmlProcessor.SimplifyUrl(StartingURL);
 
-            if (PageQueryData.RootPage == null || PageQueryData.RootPage.Resource.URL != PageQueryData.URL)
+            if (PageQueryData.RootPage == null || PageQueryData.RootPage.Resource.URL != transformedUrl)
             {
-                page = await PageQueryManager.PageManager.GetOrCreatePage(PageQueryData.URL, this);
+                page = await PageQueryManager.PageManager.GetOrCreatePage(transformedUrl, this);
                 PageQueryData.RootPage = page.DbEntity();
             } else
             {
@@ -64,10 +65,14 @@ namespace WebsiteCacher
             var toRemove = from page in PageQueryManager.Context.Pages where page.PageQuery == PageQueryData select page;
             foreach (var page in toRemove)
             {
+                page.ChildrenPages?.Clear();
+                page.Medias?.Clear();
                 PageQueryManager.Context.Pages.Remove(page);
             }
 
+            PageQueryManager.Context.SaveChanges();
             PageQueryManager.Context.PageQueries.Remove(PageQueryData);
+            PageQueryManager.Context.SaveChanges();
         }
     }
 }

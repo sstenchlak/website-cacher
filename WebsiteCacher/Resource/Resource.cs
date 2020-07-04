@@ -71,6 +71,15 @@ namespace WebsiteCacher
         }
 
         /// <summary>
+        /// Removes itself with the file stored in storage
+        /// </summary>
+        public void Remove()
+        {
+            if (IsDownloaded) Manager.Storage.Remove(Data.Hash);
+            Manager.Context.Resources.Remove(Data);
+        }
+
+        /// <summary>
         /// Gets the cached data from the filesystem
         /// </summary>
         /// <returns></returns>

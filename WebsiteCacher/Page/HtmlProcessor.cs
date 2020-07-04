@@ -2,6 +2,7 @@
 using HtmlAgilityPack;
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace WebsiteCacher
 {
@@ -86,6 +87,32 @@ namespace WebsiteCacher
             {
                 return Url.Combine(this.PageBase, link);
             }
+        }
+
+        /// <summary>
+        /// This function converts URL to much simplier form to avoid multiple URLs with same content.
+        /// For now, it only removes anchor
+        /// </summary>
+        /// <param name="Url"></param>
+        /// <returns></returns>
+        public static string SimplifyUrl(string Url)
+        {
+            var i = Url.LastIndexOf("#");
+            return i == -1 ? Url : Url.Substring(0, i);
+        }
+
+        /// <summary>
+        /// Decides whether is possible to download url.
+        /// For now, it checks if the protocol is http(s)://
+        /// </summary>
+        /// <param name="Url"></param>
+        /// <returns></returns>
+        public static bool IsDownloadable(string Url)
+        {
+            if (Url.StartsWith("data:")) return false;
+            if (Url.Contains(" ")) return false;
+            if (Url.Contains("://")) return Url.StartsWith("http");
+            return true;
         }
     }
 }
