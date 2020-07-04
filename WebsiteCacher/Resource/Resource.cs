@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace WebsiteCacher
 {
+    /// <summary>
+    /// Resource represents one file downloaded from the internet. It could be website or media, such as
+    /// css file or image. Resource contains methods for downloading, removing and obtaining its stream
+    /// from cache. Each Resource is identified by its URL which is simplified by
+    /// <see cref="HtmlProcessor.SimplifyUrl(string)"/>. Resources are stored according their hash, therefore
+    /// multiple resources may point to the same file.
+    /// </summary>
     public class Resource
     {
         /// <summary>
@@ -27,6 +34,10 @@ namespace WebsiteCacher
         public string ContentType { get => Data.ContentType; }
         public bool IsDownloaded { get => Data.Hash != null; }
 
+        /// <summary>
+        /// Helper method to download resource from the internet, but not save it.
+        /// </summary>
+        /// <returns></returns>
         private async Task<HttpResponseMessage> Fetch()
         {
             try
@@ -71,11 +82,10 @@ namespace WebsiteCacher
         }
 
         /// <summary>
-        /// Removes itself with the file stored in storage
+        /// Removes itself without the file stored in storage, because multiple resources may point here.
         /// </summary>
         public void Remove()
         {
-            if (IsDownloaded) Manager.Storage.Remove(Data.Hash);
             Manager.Context.Resources.Remove(Data);
         }
 

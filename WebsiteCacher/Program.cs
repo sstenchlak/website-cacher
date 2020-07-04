@@ -26,7 +26,7 @@ namespace WebsiteCacher
 
             AsyncPump.Run(async delegate
             {
-                var s = new Server(8081, resourceManager, pageQueryManager);
+                var s = new Server(8080, resourceManager, pageQueryManager);
                 await s.Start();
             });
 
