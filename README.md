@@ -1,4 +1,4 @@
-# website-cacher
+# website-cacher - An amazing project 
 Simple utility for downloading web pages for offline browsing.
 
 Application has two parts. Server written in C# .NET Core 3.1 and a web client in Typescript and Node.js. The purpose of the server is to download, scrape and cache webpages which are then server over http client. The server has no user interface. The purpose of the Webclient is to controll the behaviour of the server and give a youser some information when he/she browses the webpages.
