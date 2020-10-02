@@ -1,4 +1,4 @@
-# website-cacher
+# Website-Cacher- An Amzing Tool
 Simple utility for downloading web pages for offline browsing.
 
 Application has two parts. Server written in C# .NET Core 3.1 and a web client in Typescript and Node.js. The purpose of the server is to download, scrape and cache webpages which are then server over http client. The server has no user interface. The purpose of the Webclient is to controll the behaviour of the server and give a youser some information when he/she browses the webpages.
@@ -11,7 +11,7 @@ npm install
 npm run build
 ```
 
-Then you have to copy all the files from `WebClient/dist` and `WebClient/static` directories into `static/` directory where the server is located. These files will be hosted by a WebsiteCacher to a client with offline webpages.
+Then you have to copy all the files from `WebClient/dist` and `WebClient/static` directories into `static/` directory where the server is located. These files will be hosted by a Website=Cacher to a client with offline webpages.
 ```PowerShell
 cp WebClient/dist/*
 ```
@@ -23,7 +23,7 @@ As mentioned above, the server is written in C# .NET Core 3.1 and uses Entity Fr
 
 `Resource` represents a single file which was downloaded from the internet and can be accessed by a web browser.
 
-Resources are identified by their URLs and are stored in local file system under their hash. Therefore multiple URLs with the same content are stored only once. Hash is computed in `HashSolver` class and for now it computes MD5. It may be extended for example to ignore "this page was generated in XX:ZZ" during hash computation.
+Resources are identified by their URL's and are stored in local file system under their hash. Therefore multiple URL's with the same content are stored only once. Hash is computed in `HashSolver` class and for now it computes MD5. It may be extended for example to ignore "this page was generated in XX:ZZ" during hash computation.
 
 `Storage` class deals with saving files to local file system. Resources are stored as `downloads/<first 2 letters of hash>/hash`.
 
@@ -87,7 +87,7 @@ Update-Database
 
 When you hover over a link, one of the following three boxes appear and informs you about the state of the link.
 
-**For URLs that was not meant to be cached:**
+**For URL's that was not meant to be cached:**
 
 ![This URL is not chached at all](doc/not.png "This URL is not chached at all")
 
@@ -95,6 +95,6 @@ When you hover over a link, one of the following three boxes appear and informs 
 
 ![This URL is not cached yet](doc/not_yet.png "This URL is not cached yet")
 
-**For chached URLs:**
+**For chached URL's:**
 
 ![Cached](doc/cached.png "Cached")
